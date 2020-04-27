@@ -1,0 +1,11 @@
+saves/*
+
+!saves/palm_png/
+!saves/balls_jpg/
+!saves/road_png/
+
+originals/*
+
+!originals/palm.png/
+!originals/balls.jpg/
+!originals/road.png/
