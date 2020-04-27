@@ -1,4 +1,4 @@
-# KMeans-Image-Filter
+# K-Means-Image-Filter
 Color segmentation for images
 
 ## Input
