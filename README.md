@@ -4,9 +4,16 @@ Color segmentation for jpg and png images.
 # Implementation
 The basic usage
 
-![image](https://user-images.githubusercontent.com/57909721/80401630-f2629e80-88bc-11ea-8e3a-801a0925208e.png)
+# Input
+![input](https://user-images.githubusercontent.com/57909721/80402033-93515980-88bd-11ea-8a66-1bc224a6c2c3.jpg)
+
+# Code
+Note: Image will be opened in your default image viewing program.
+![code](https://user-images.githubusercontent.com/57909721/80402706-97ca4200-88be-11ea-8239-529d6235b152.PNG)
+
+# Result
+![result](https://user-images.githubusercontent.com/57909721/80402265-f642f080-88bd-11ea-8e22-5dd1816653e6.jpg)
 
 
-Image will be opened in your default image viewing program.
 
-![image](https://user-images.githubusercontent.com/57909721/80400634-5dab7100-88bb-11ea-8d7f-25ffc5acc91c.png)
+
