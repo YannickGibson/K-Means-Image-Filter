@@ -11,6 +11,13 @@ Color segmentation for images
 ## Code
 Note: `img.show()` will display the image by your default image viewing program.  
   
-<img src="https://user-images.githubusercontent.com/57909721/80402706-97ca4200-88be-11ea-8239-529d6235b152.PNG" width="400" />
+```python
+import filter
 
-
+img = filter.simplify("originals/balls.jpg", 6)
+img.show()
+```
+### Saving
+```python
+img.save("example/destination")
+```
