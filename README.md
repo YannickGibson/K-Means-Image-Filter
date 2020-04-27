@@ -13,6 +13,6 @@ The basic usage
 
 # Code
 Note: Image will be opened in your default image viewing program.  
-<img src="https://user-images.githubusercontent.com/57909721/80402706-97ca4200-88be-11ea-8239-529d6235b152.png" width="400" />
+<img src="https://user-images.githubusercontent.com/57909721/80402706-97ca4200-88be-11ea-8239-529d6235b152.PNG" width="400" />
 
 
