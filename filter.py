@@ -112,8 +112,7 @@ def k_means(file_name, k, plot_final = False, plot_steps = False, logs = False):
     if logs:
         print("Aplying '{}-Color Filter' on {}x{} image '{}'".format(k, width, height, file_name))
 
-    has_transparency =  file_name.split('.')[ -1 ] == "png"
-
+    has_transparency =  file_name.split('.')[ -1 ] == "png" and len(pixels[0]) == 4 # len([R,G,B,A]) == 4 √
     #data preparation
     img_rgbs = ([],[],[])
     for pixel in pixels:
@@ -253,7 +252,7 @@ def main():
 
 
 
-    file_name = "carti_what.jpg"
+    file_name = "maya.png"
     ori_folder = "originals"
     original_dest = os.path.join(ori_folder,file_name)
     save_folder = "saves"
