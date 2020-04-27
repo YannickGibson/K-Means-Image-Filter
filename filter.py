@@ -12,7 +12,7 @@ from matplotlib.colors import TABLEAU_COLORS
 from matplotlib.colors import get_named_colors_mapping
 
 colors = list(map(lambda x: x.split(':')[1],TABLEAU_COLORS.keys()))
-centerColors = ["red","green","orange","blue","hotpink","darkviolet","darkgray","peru"]# For some reason 'darkgray' is not darker than 'gray' lmao check docs
+center_colors = ["red","green","orange","blue","hotpink","darkviolet","darkgray","peru"]# For some reason 'darkgray' is not darker than 'gray' lmao check docs
 groupColors = ["darkred","darkgreen","darkorange","darkblue","mediumvioletred","indigo","dimgrey","saddlebrown"]
 rndColor = lambda : random.choice(colors)
 COLOR_LENGTH = len(colors)
@@ -33,7 +33,7 @@ if not hasattr(Axis, "_get_coord_info_old"):
 ax = None
 
 
-def compareGroups(g1, g2):
+def compare_groups(g1, g2):
 
     # k is the color_group of group
     for k in range(len( g1 )):
@@ -77,7 +77,7 @@ def compareGroups(g1, g2):
 
     return True
 
-def createPlot(name):
+def create_plot(name):
     fig = pyplot.figure(name)
     ax = Axes3D(fig)
 
@@ -88,49 +88,49 @@ def createPlot(name):
     ax.view_init(azim=-130,elev=30)
     return ax
 
-def generateCenters(K):
+def generate_centers(k):
     centers = ([],[],[])
-    for k in range(K):
+    for _ in range(k):
         centers[0].append(random.randint(0,255))
         centers[1].append(random.randint(0,255))
         centers[2].append(random.randint(0,255))
     return centers
 
-def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, logs = False):#using K-Means algorithm
-    if colorsK <= 0:
+def k_means(file_name, k, plot_final = False, plot_steps = False, logs = False):#using K-Means algorithm
+    if k <= 0:
         raise Exception("Number of colors must be greater than 0")
    
 
-    recenterCount = 0
-    img = Image.open(fileName)
+    recenter_count = 0
+    img = Image.open(file_name)
     pixels = list(img.getdata())
     distinct = len(set(pixels))
-    if colorsK >= distinct:
-        raise Exception("Number of colors '{}' must be smaller than number of distinct colors in entered image '{}'".format(colorsK, distinct))
+    if k >= distinct:
+        raise Exception("Number of colors '{}' must be smaller than number of distinct colors in entered image '{}'".format(k, distinct))
     width, height = img.size
 
     if logs:
-        print("Aplying '{}-Color Filter' on {}x{} image '{}'".format(colorsK, width, height, fileName))
+        print("Aplying '{}-Color Filter' on {}x{} image '{}'".format(k, width, height, file_name))
 
-    hasTransparency = len(pixels[0]) == 4
+    has_transparency =  file_name.split('.')[ -1 ] == "png"
 
     #data preparation
-    imgRGBs = ([],[],[])
+    img_rgbs = ([],[],[])
     for pixel in pixels:
-        imgRGBs[0].append(pixel[0])
-        imgRGBs[1].append(pixel[1])
-        imgRGBs[2].append(pixel[2])
+        img_rgbs[0].append(pixel[0])
+        img_rgbs[1].append(pixel[1])
+        img_rgbs[2].append(pixel[2])
     #
-    centers = generateCenters(colorsK)
+    centers = generate_centers(k)
 
-    groupsTemp = []
+    groups_temp = []
     groups = None
     recenter_cycles = 0
     while True:
         # Reset groups
-        groups = [([],[],[],[]) for _ in range(colorsK)]
+        groups = [([],[],[],[]) for _ in range(k)]
 
-        centerAloneIndexes = []
+        center_alone_indexes = []
 
 
         
@@ -138,47 +138,46 @@ def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, l
 
         #GROUPING pixels
         for order, pix in enumerate(pixels):# 
-            if hasTransparency and pix[3] == 0:
+            if has_transparency and pix[3] == 0:
                 continue
-            minDistIndex = 0
-            smallestDist = -1
-            for k in range(0,colorsK):
-                currVector = (centers[0][k] - pix[0], centers[1][k] - pix[1], centers[2][k] - pix[2])
-                currDist = math.sqrt(currVector[0]*currVector[0] + currVector[1]*currVector[1] + currVector[2]*currVector[2])
-                if currDist < smallestDist or smallestDist == -1:
-                    smallestDist = currDist
-                    minDistIndex = k
+            min_dist_index = 0
+            smallest_dist = -1
+            for _k in range(0,k):
+                curr_vector = (centers[0][_k] - pix[0], centers[1][_k] - pix[1], centers[2][_k] - pix[2])
+                curr_dist = math.sqrt(curr_vector[0]*curr_vector[0] + curr_vector[1]*curr_vector[1] + curr_vector[2]*curr_vector[2])
+                if curr_dist < smallest_dist or smallest_dist == -1:
+                    smallest_dist = curr_dist
+                    min_dist_index = _k
 
-            groups[minDistIndex][0].append(pix[0])
-            groups[minDistIndex][1].append(pix[1])
-            groups[minDistIndex][2].append(pix[2])
-            groups[minDistIndex][3].append(order)
+            groups[min_dist_index][0].append(pix[0])
+            groups[min_dist_index][1].append(pix[1])
+            groups[min_dist_index][2].append(pix[2])
+            groups[min_dist_index][3].append(order)
 
         #Trying to asign ALONE center points
-        for k in range(colorsK):
-            groupLength = len(groups[k][0])
-            if groupLength == 0:
-                centerAloneIndexes.append(k)
+        for _k in range(k):
+            group_length = len(groups[_k][0])
+            if group_length == 0:
+                center_alone_indexes.append(_k)
             else:#recentering here
-                xSum = sum(groups[k][0])
-                ySum = sum(groups[k][1])
-                zSum = sum(groups[k][2])
-                centers[0][k] = int(xSum / groupLength)
-                centers[1][k] = int(ySum / groupLength)
-                centers[2][k] = int(zSum / groupLength)
+                x_sum = sum(groups[_k][0])
+                y_sum = sum(groups[_k][1])
+                z_sum = sum(groups[_k][2])
+                centers[0][_k] = int(x_sum / group_length)
+                centers[1][_k] = int(y_sum / group_length)
+                centers[2][_k] = int(z_sum / group_length)
 
-        if len(centerAloneIndexes) != 0:
-            generateCenters(colorsK)
-            groups = [([],[],[],[]) for _ in range(colorsK)]
-            recenterCount = len(centerAloneIndexes)
-            newCenters = generateCenters(recenterCount)
-            for i, cInd in enumerate(centerAloneIndexes):
-                centers[0][cInd] = newCenters[0][i]
-                centers[1][cInd] = newCenters[1][i]
-                centers[2][cInd] = newCenters[2][i]
+        if len(center_alone_indexes) != 0:
+            generate_centers(k)
+            recenter_count = len(center_alone_indexes)
+            new_centers = generate_centers(recenter_count)
+            for i, c_ind in enumerate(center_alone_indexes):
+                centers[0][c_ind] = new_centers[0][i]
+                centers[1][c_ind] = new_centers[1][i]
+                centers[2][c_ind] = new_centers[2][i]
             
             if logs:
-                print("Asigning " + str(recenterCount) + " ALONE center color" + ("" if recenterCount==1 else "s") )
+                print("Asigning " + str(recenter_count) + " alone center color" + ("" if recenter_count==1 else "s") )
 
             continue#repeat WhileLoop from start
 
@@ -186,54 +185,53 @@ def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, l
 
         # If groups didn't change after 'Recentering' -> We quit the loop
         # Always check if recentering changed, so this if is never true on first iteration 
-        if len(groupsTemp) != 0:
+        if len(groups_temp) != 0:
             
             if (logs):
                 print("Points of groups are recentered: " + str(recenter_cycles))
 
-            if compareGroups(groups, groupsTemp): # groupsTemp == groups:
+            if compare_groups(groups, groups_temp): # groups_temp == groups:
                 break
-        groupsTemp = copy.deepcopy(groups)
+        groups_temp = copy.deepcopy(groups)
 
 
         recenter_cycles += 1
 
         
-        if showPlotSteps == True:
-            ax = createPlot(name="Cycles: " + str(recenter_cycles))
+        if plot_steps == True:
+            ax = create_plot(name="Cycles: " + str(recenter_cycles))
             for g in range(len(groups)):
-                ax.scatter(groups[g][0], groups[g][1], groups[g][2], marker='o', s=50, c=centerColors[g % COLOR_LENGTH], alpha=0.05)
-                ax.scatter(centers[0][g], centers[1][g], centers[2][g], s=3000, c=centerColors[g % COLOR_LENGTH], alpha=0.8)#just a point
+                ax.scatter(groups[g][0], groups[g][1], groups[g][2], marker='o', s=50, c=center_colors[g % COLOR_LENGTH], alpha=0.05)
+                ax.scatter(centers[0][g], centers[1][g], centers[2][g], s=3000, c=center_colors[g % COLOR_LENGTH], alpha=0.8)#just a point
 
             pyplot.show()
 
 
 
 
-    if showPlotFinish:
-        ax = createPlot(name="Finished | Cycles: " + str(recenter_cycles))
+    if plot_final or plot_steps:
+        ax = create_plot(name="Finished | Cycles: " + str(recenter_cycles))
         for g in range(len(groups)):
-            ax.scatter(groups[g][0], groups[g][1], groups[g][2], marker='o', s=50, c=centerColors[g], alpha=0.05)
-            ax.scatter(centers[0][g], centers[1][g], centers[2][g], s=3000, c=centerColors[g], alpha=0.8)#just a point
+            ax.scatter(groups[g][0], groups[g][1], groups[g][2], marker='o', s=50, c=center_colors[g], alpha=0.05)
+            ax.scatter(centers[0][g], centers[1][g], centers[2][g], s=3000, c=center_colors[g], alpha=0.8)#just a point
         pyplot.show()
     data = None
 
-    if hasTransparency:
+    if has_transparency:
         data = np.zeros( (height,width,4), dtype=np.uint8 )#3 means RGB
 
-        for k in range(colorsK):
+        for k in range(k):
             for order in groups[k][3]:#fourth is for order
                 color = (centers[0][k], centers[1][k], centers[2][k], 255)#255 for opacity
                 data[order//width,order%width] = color#going from top to bottom, then x++
     else:
         data = np.zeros( (height,width,3), dtype=np.uint8 )#3 means RGB
 
-        for k in range(colorsK):
+        for k in range(k):
             for order in groups[k][3]:#fourth is for order
                 color = (centers[0][k], centers[1][k], centers[2][k])
                 data[order//width,order%width] = color#going from top to bottom, then x++
 
-    
 
     return Image.fromarray(data)
 
@@ -255,38 +253,38 @@ def main():
 
 
 
-    fileName = "water_drop.jpg"
+    file_name = "carti_what.jpg"
     ori_folder = "originals"
-    original_dest = os.path.join(ori_folder,fileName)
+    original_dest = os.path.join(ori_folder,file_name)
     save_folder = "saves"
-    K = 3
+    k = 4
 
     start_time = time.time()
-    img = simplify(original_dest, K, logs=True, showPlotSteps=True)
-    timeElapsed = time.time() - start_time
-    print("Execution time: %s" % display_time(round(timeElapsed)))
+    img = k_means(original_dest, k, logs=True, plot_steps=False)
+    time_elapsed = time.time() - start_time
+    print("Execution time: %s" % display_time(round(time_elapsed)))
     
 
     # What a mess lol
-    sub_split = fileName.split('.')
-    subFolderName = "_".join( (".".join(sub_split[:-1]), sub_split[-1]) )
-    subFolderPath = os.path.join(save_folder, subFolderName)
-    if not os.path.exists(subFolderPath):
-        os.makedirs(subFolderPath)
-        shutil.copy(original_dest, subFolderPath)
-    splitted = fileName.split(".")
+    sub_split = file_name.split('.')
+    sub_folder_name = "_".join( (".".join(sub_split[:-1]), sub_split[-1]) )
+    sub_folder_path = os.path.join(save_folder, sub_folder_name)
+    if not os.path.exists(sub_folder_path):
+        os.makedirs(sub_folder_path)
+        shutil.copy(original_dest, sub_folder_path)
+    splitted = file_name.split(".")
     prefix, postfix = ".".join(splitted[:-1]), splitted[-1]
-    newFileName = "{}x{}".format(prefix, K)
-    newFilePath = os.path.join(subFolderPath, newFileName)
-    if os.path.exists(newFilePath + "." + postfix):
+    _new_file_name = "{}_x{}".format(prefix, k)
+    new_file_path = os.path.join(sub_folder_path, _new_file_name)
+    if os.path.exists(new_file_path + "." + postfix):
         i=1
-        while os.path.exists(newFilePath + "_{}.{}".format(i, postfix)):
+        while os.path.exists(new_file_path + "_{}.{}".format(i, postfix)):
             i += 1
-        newFilePath = newFilePath + "_" + str(i)
+        new_file_path = new_file_path + "_" + str(i)
 
-    save_path = os.path.join(newFilePath + "." + postfix)
-    ret = img.save(save_path)
+    save_path = os.path.join(new_file_path + "." + postfix)
     img.show()
+    ret = img.save(save_path)
 
 
 if __name__ == "__main__":

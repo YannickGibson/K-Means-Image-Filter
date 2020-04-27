@@ -1,6 +1,9 @@
-import filter
+from filter import k_means
 
 # Settings 'showPlotFinish' or 'showPlotFinish' to True is not recommended for images with more than 250*250 pixels
-img = filter.simplify("originals/water_drop.jpg", 5, logs=True, showPlotFinish=True)
-
+img = k_means("originals/balls.jpg", k=6)
 img.show()
+
+
+
+
