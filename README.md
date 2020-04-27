@@ -12,9 +12,9 @@ Color segmentation for images
 Note: `img.show()` will display the image by your default image viewing program.  
   
 ```python
-import filter
+from filter import k_means
 
-img = filter.simplify("originals/balls.jpg", 6)
+img = k_means("originals/balls.jpg", k=6)
 img.show()
 ```
 ### Saving
