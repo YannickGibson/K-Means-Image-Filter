@@ -1,11 +1,20 @@
+/favs/
+
+# Ignore everything in this folder
 /saves/*
 
+# Except these files
 !/saves/palm_png/
 !/saves/balls_jpg/
 !/saves/road_png/
+!/saves/plot_example_jpg/
 
+
+# Ignore everything in this folder
 /originals/*
 
-!/originals/palm.png/
-!/originals/balls.jpg/
-!/originals/road.png/
+# Except these files
+!/originals/palm.png
+!/originals/balls.jpg
+!/originals/road.png
+!/originals/plot_example.jpg

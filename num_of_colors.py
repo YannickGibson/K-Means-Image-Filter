@@ -17,7 +17,7 @@ def n_distinct(l):
 
 def main():
     from PIL import Image
-    filePath = "originals/bruh.jpg"
+    filePath = "originals/balls.jpg"
     #filePath = "saves/hi homer_jpg/hi homerx2.jpg" # buncho collors
     #filePath = "saves/hi homer_png/hi homerx2.png" # two colors
     im = Image.open(filePath)
@@ -27,4 +27,5 @@ def main():
 
     print("The image is made of {} colors".format(number))
 
-main()
+if __name__ == "__main__":
+    main()

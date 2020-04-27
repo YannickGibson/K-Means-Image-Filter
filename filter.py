@@ -6,6 +6,7 @@ import math
 import os
 import shutil
 import numpy as np
+import copy
 
 from matplotlib.colors import TABLEAU_COLORS
 from matplotlib.colors import get_named_colors_mapping
@@ -29,23 +30,63 @@ if not hasattr(Axis, "_get_coord_info_old"):
     Axis._get_coord_info = _get_coord_info_new
 ###patch end###
 
-
-fig = pyplot.figure()
-ax = Axes3D(fig)
-
-"""  
-# Limiting Axes
-ax.set_xlim3d(0, 256)#limit
-ax.set_ylim3d(0,256)
-ax.set_zlim3d(0,256) """
-
-# Step of axises
-ax.set_xticks(list(range(0,256+1,64)))
-ax.set_yticks(list(range(0,256+1,64)))
-ax.set_zticks(list(range(0,256+1,64)))
-ax.view_init(azim=-130,elev=30)
+ax = None
 
 
+def compareGroups(g1, g2):
+
+    # k is the color_group of group
+    for k in range(len( g1 )):
+
+        # Components are 0: Red, 1: Green, 2: Blue, 3: Order in image
+        for component_type_index in range(len( g1[k] )):
+
+            # If N of colors in g1.a != N of colors in g2.a
+            if len(g1[k][component_type_index]) != len(g2[k][component_type_index]):
+                pass
+                #return False
+
+            for comp_index in range(len( g1[k][component_type_index] )):
+
+
+                
+                """ print("----1----")
+                print(g1)
+                print("----2----")
+                print(g2)
+                print("----3----")
+                return True """
+                comp1 = g1[k][component_type_index][comp_index]
+
+                comp2 = g2[k]\
+                [component_type_index]\
+                [comp_index]
+                """  
+                try:
+                    comp2 = g2[k]\
+                    [component_type_index]\
+                    [comp_index]
+                except:
+                    print(len(g1[k][component_type_index]), len(g2[k][component_type_index]), comp_index)
+                    import sys
+                    raise Exception(sys.exc_info()) """
+
+                # Comparing component int values
+                if comp1 != comp2:
+                    return False
+
+    return True
+
+def createPlot(name):
+    fig = pyplot.figure(name)
+    ax = Axes3D(fig)
+
+    # Step of axises
+    ax.set_xticks(list(range(0,256+1,64)))
+    ax.set_yticks(list(range(0,256+1,64)))
+    ax.set_zticks(list(range(0,256+1,64)))
+    ax.view_init(azim=-130,elev=30)
+    return ax
 
 def generateCenters(K):
     centers = ([],[],[])
@@ -83,10 +124,17 @@ def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, l
     centers = generateCenters(colorsK)
 
     groupsTemp = []
-    groups = [([],[],[],[]) for _ in range(colorsK)]
-    cycles = 0
+    groups = None
+    recenter_cycles = 0
     while True:
+        # Reset groups
+        groups = [([],[],[],[]) for _ in range(colorsK)]
+
         centerAloneIndexes = []
+
+
+        
+
 
         #GROUPING pixels
         for order, pix in enumerate(pixels):# 
@@ -106,7 +154,7 @@ def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, l
             groups[minDistIndex][2].append(pix[2])
             groups[minDistIndex][3].append(order)
 
-        #recenter
+        #Trying to asign ALONE center points
         for k in range(colorsK):
             groupLength = len(groups[k][0])
             if groupLength == 0:
@@ -130,12 +178,29 @@ def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, l
                 centers[2][cInd] = newCenters[2][i]
             
             if logs:
-                print("Reasigning " + str(recenterCount) + " center color" + ("" if recenterCount==1 else "s") )
+                print("Asigning " + str(recenterCount) + " ALONE center color" + ("" if recenterCount==1 else "s") )
 
             continue#repeat WhileLoop from start
 
         
+
+        # If groups didn't change after 'Recentering' -> We quit the loop
+        # Always check if recentering changed, so this if is never true on first iteration 
+        if len(groupsTemp) != 0:
+            
+            if (logs):
+                print("Points of groups are recentered: " + str(recenter_cycles))
+
+            if compareGroups(groups, groupsTemp): # groupsTemp == groups:
+                break
+        groupsTemp = copy.deepcopy(groups)
+
+
+        recenter_cycles += 1
+
+        
         if showPlotSteps == True:
+            ax = createPlot(name="Cycles: " + str(recenter_cycles))
             for g in range(len(groups)):
                 ax.scatter(groups[g][0], groups[g][1], groups[g][2], marker='o', s=50, c=centerColors[g % COLOR_LENGTH], alpha=0.05)
                 ax.scatter(centers[0][g], centers[1][g], centers[2][g], s=3000, c=centerColors[g % COLOR_LENGTH], alpha=0.8)#just a point
@@ -143,17 +208,10 @@ def simplify(fileName, colorsK, showPlotFinish = False, showPlotSteps = False, l
             pyplot.show()
 
 
-        #no change happened, so we quit
-        if groupsTemp == groups:
-            break
-        groupsTemp = groups[:]
-        cycles += 1
-
-    if logs:
-        print("Cycles: " + str(cycles))
 
 
     if showPlotFinish:
+        ax = createPlot(name="Finished | Cycles: " + str(recenter_cycles))
         for g in range(len(groups)):
             ax.scatter(groups[g][0], groups[g][1], groups[g][2], marker='o', s=50, c=centerColors[g], alpha=0.05)
             ax.scatter(centers[0][g], centers[1][g], centers[2][g], s=3000, c=centerColors[g], alpha=0.8)#just a point
@@ -197,14 +255,14 @@ def main():
 
 
 
-    fileName = "balls.jpg"
+    fileName = "water_drop.jpg"
     ori_folder = "originals"
     original_dest = os.path.join(ori_folder,fileName)
     save_folder = "saves"
-    K = 12
+    K = 3
 
     start_time = time.time()
-    img = simplify(original_dest, K, logs=True, showPlotFinish=False)
+    img = simplify(original_dest, K, logs=True, showPlotSteps=True)
     timeElapsed = time.time() - start_time
     print("Execution time: %s" % display_time(round(timeElapsed)))
     
