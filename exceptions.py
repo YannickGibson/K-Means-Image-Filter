@@ -1,5 +1,6 @@
 
-# Inherit from 'Exception' class
+# Inheriting from 'Exception' class
+
 class ValueTooSmall(Exception):
     pass
 
