@@ -125,8 +125,10 @@ class UnitTest:
             group2[r_color_group][3].append(r_num4 + 1)
         
 
+
         ## ACT
         result = filter.compare_groups(group1, group2)
+
 
         ## ASSERT
         return result == False
