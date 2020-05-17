@@ -1,5 +1,7 @@
 import filter
 import exceptions    
+import random
+import time
 
 class UnitTest:
 
@@ -70,12 +72,12 @@ class UnitTest:
 
         # Image with 1000 pixels total
         for i in range(1000):
-            r_color_group = filter.random.randint(0,11)
+            r_color_group = random.randint(0,11)
 
-            r_num1 = filter.random.randint(0,255)
-            r_num2 = filter.random.randint(0,255)
-            r_num3 = filter.random.randint(0,255)
-            r_num4 = filter.random.randint(0,255)
+            r_num1 = random.randint(0,255)
+            r_num2 = random.randint(0,255)
+            r_num3 = random.randint(0,255)
+            r_num4 = random.randint(0,255)
 
             group1[r_color_group][0].append(r_num1)
             group1[r_color_group][1].append(r_num2)
@@ -95,7 +97,7 @@ class UnitTest:
         return result
         
 
-    def comparing_groups_of_numbers_with_all_unqual_values(self):
+    def comparing_groups_of_numbers_with_all_unequal_values(self):
 
         ## ARRANGE
 
@@ -105,12 +107,12 @@ class UnitTest:
 
         # Image with 1000 pixels total
         for i in range(1000):
-            r_color_group = filter.random.randint(0,11)
+            r_color_group = random.randint(0,11)
 
-            r_num1 = filter.random.randint(0,255)
-            r_num2 = filter.random.randint(0,255)
-            r_num3 = filter.random.randint(0,255)
-            r_num4 = filter.random.randint(0,255)
+            r_num1 = random.randint(0,255)
+            r_num2 = random.randint(0,255)
+            r_num3 = random.randint(0,255)
+            r_num4 = random.randint(0,255)
 
             group1[r_color_group][0].append(r_num1)
             group1[r_color_group][1].append(r_num2)
@@ -131,7 +133,7 @@ class UnitTest:
 
         
 
-    def comparing_groups_of_numbers_with_one_unqual_values(self):
+    def comparing_groups_of_numbers_with_one_unequal_values(self):
 
         ## ARRANGE
 
@@ -141,12 +143,12 @@ class UnitTest:
 
         # Image with 1000 pixels total
         for i in range(1000):
-            r_color_group = filter.random.randint(0,11)
+            r_color_group = random.randint(0,11)
 
-            r_num1 = filter.random.randint(0,255)
-            r_num2 = filter.random.randint(0,255)
-            r_num3 = filter.random.randint(0,255)
-            r_num4 = filter.random.randint(0,255)
+            r_num1 = random.randint(0,255)
+            r_num2 = random.randint(0,255)
+            r_num3 = random.randint(0,255)
+            r_num4 = random.randint(0,255)
 
             group1[r_color_group][0].append(r_num1)
             group1[r_color_group][1].append(r_num2)
@@ -189,6 +191,7 @@ def run_all_tests():
 
         error = None
         result = False
+        start_time = time.time()
         try: 
             # Running test function
             result = fun(unitTest)
@@ -200,8 +203,10 @@ def run_all_tests():
         if error != None:
             str_result += ": " + str(error) 
 
+        time_elapsed = time.time() - start_time
+
         # Log
-        print("||{} - {}".format(fun_name, str_result))
+        print("||{} - {} ({}ms)".format(fun_name, str_result, round(time_elapsed * 1000)))
 
     print("|")
             
