@@ -1,3 +1,5 @@
+import exceptions
+
 from PIL import Image
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
@@ -98,7 +100,7 @@ def generate_centers(k):
 
 def k_means(file_name, k, plot_final = False, plot_steps = False, logs = False):#using K-Means algorithm
     if k <= 0:
-        raise Exception("Number of colors must be greater than 0")
+        raise exceptions.ValueTooSmall("Number of colors must be greater than 0")
    
 
     recenter_count = 0
@@ -246,22 +248,22 @@ def main():
             hours = minutes // 60
             if hours != 0:
                 minutes %= 60
-                return "{}hours {}minutes {}seconds".format(hours, minutes, seconds)
-            return "{}minutes {}seconds".format(minutes, seconds)
-        return "{}seconds".format(seconds)
+                return "{} hours {} minutes {} seconds".format(hours, minutes, seconds)
+            return "{} minutes {} seconds".format(minutes, seconds)
+        return "{} seconds".format(seconds)
 
 
 
-    file_name = "maya.png"
+    file_name = "maya2.jpg"
     ori_folder = "originals"
     original_dest = os.path.join(ori_folder,file_name)
     save_folder = "saves"
-    k = 4
+    k = 5
 
     start_time = time.time()
     img = k_means(original_dest, k, logs=True, plot_steps=False)
     time_elapsed = time.time() - start_time
-    print("Execution time: %s" % display_time(round(time_elapsed)))
+    print("K:%d, Execution time: %s" % (k, display_time( round(time_elapsed) )) )
     
 
     # What a mess lol
